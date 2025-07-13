@@ -205,7 +205,7 @@ process_route() {
 
 # Main
 [[ $# -eq 2 ]] || usage
-config_file=$1; [[ -f "$config_file" ]] || { echo "Error: Config $config_file not found" >&2; exit 1; }
+config_file=$1; action=$2; [[ -f "$config_file" ]] || { echo "Error: Config $config_file not found" >&2; exit 1; }
 # Load env
 # shellcheck disable=SC1090
 source "$config_file"
