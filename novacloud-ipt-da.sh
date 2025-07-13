@@ -11,9 +11,6 @@ error_handler() {
 }
 trap 'error_handler $LINENO' ERR
 
-# Convert to lowercase helper
-to_lower() { echo "$1" | tr '[:upper:]' '[:lower:]'; }
-
 # Usage message
 usage() {
     echo "Usage: $0 <config_file> <up|down>"
@@ -34,7 +31,6 @@ process_tunnel() {
     if [[ "$action" == "up" ]]; then
         # Create tunnel
         [[ -n "${TUNNEL_TYPE:-}" && -n "${GATEWAY_IPV4:-}" && -n "${GATEWAY_IPV6:-}" && -n "${ADDRESSES:-}" ]] || { echo "Error: TUNNEL_TYPE, GATEWAY_IPV4, GATEWAY_IPV6 or ADDRESSES not set" >&2; exit 1; }
-        TUNNEL_TYPE=$(to_lower "${TUNNEL_TYPE}")
         case "$TUNNEL_TYPE" in
             gre|gretap)
                 [[ -n "${ENDPOINT_REMOTE:-}" && -n "${ENDPOINT_LOCAL:-}" ]] || { echo "Error: ENDPOINT_REMOTE or ENDPOINT_LOCAL not set" >&2; exit 1; }
@@ -209,7 +205,7 @@ process_route() {
 
 # Main
 [[ $# -eq 2 ]] || usage
-config_file=$1; action=$(to_lower "$2"); [[ -f "$config_file" ]] || { echo "Error: Config $config_file not found" >&2; exit 1; }
+config_file=$1; [[ -f "$config_file" ]] || { echo "Error: Config $config_file not found" >&2; exit 1; }
 # Load env
 # shellcheck disable=SC1090
 source "$config_file"
