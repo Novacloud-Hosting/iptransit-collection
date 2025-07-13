@@ -33,7 +33,7 @@ preprocess_address() {
 process_tunnel() {
     if [[ "$action" == "up" ]]; then
         # Create tunnel
-        [[ -n "${TUNNEL_TYPE:-}" ]] || { echo "Error: TUNNEL_TYPE not set" >&2; exit 1; }
+        [[ -n "${TUNNEL_TYPE:-}" && -n "${GATEWAY_IPV4:-}" && -n "${GATEWAY_IPV6:-}" && -n "${ADDRESSES:-}" ]] || { echo "Error: TUNNEL_TYPE, GATEWAY_IPV4, GATEWAY_IPV6 or ADDRESSES not set" >&2; exit 1; }
         TUNNEL_TYPE=$(to_lower "${TUNNEL_TYPE}")
         case "$TUNNEL_TYPE" in
             gre|gretap)
