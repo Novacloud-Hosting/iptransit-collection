@@ -123,7 +123,7 @@ process_default_route() {
                         exit 1
                     fi
                 fi
-                ip -4 route change default via $GATEWAY_IPV4 dev $TUNNEL_IF table main onlink || { ip -4 route del default && ip -4 route add default via $GATEWAY_IPV4 dev $TUNNEL_IF table main onlink; } || { echo "Error: failed while adding Default-route IPv4 for Tunnel to main-table."; exit 1; }
+                ip -4 route change default via $GATEWAY_IPV4 dev $TUNNEL_IF table main onlink || { ip -4 route del default table main && ip -4 route add default via $GATEWAY_IPV4 dev $TUNNEL_IF table main onlink; } || { echo "Error: failed while adding Default-route IPv4 for Tunnel to main-table."; exit 1; }
             fi
 
             if [[ ${#ipv6_addrs[@]} -gt 0 ]]; then
@@ -146,7 +146,7 @@ process_default_route() {
                         exit 1
                     fi
                 fi
-                ip -6 route change default via $GATEWAY_IPV6 dev $TUNNEL_IF table main onlink || { ip -6 route del default && ip -6 route add default via $GATEWAY_IPV6 dev $TUNNEL_IF table main onlink; } || { echo "Error: failed while adding Default-route IPv6 for Tunnel to main-table."; exit 1; }
+                ip -6 route change default via $GATEWAY_IPV6 dev $TUNNEL_IF table main onlink || { ip -6 route del default table main && ip -6 route add default via $GATEWAY_IPV6 dev $TUNNEL_IF table main onlink; } || { echo "Error: failed while adding Default-route IPv6 for Tunnel to main-table."; exit 1; }
             fi
 
         elif [[ "$action" == "down" ]]; then
@@ -154,7 +154,7 @@ process_default_route() {
             # IPv4 default-route cleanup
             if ip -4 route show table "$ROUTE_TABLE" | grep -q '^default '; then
                 echo "IPv4 default route exists in table $ROUTE_TABLE"
-                ip -4 route change $(ip -4 route show table $ROUTE_TABLE default) table main || echo "Error: Cannot restore original default ipv4 route, possibly the table is in an unclean state."
+                ip -4 route change $(ip -4 route show table $ROUTE_TABLE default) table main || { ip -4 route del default table main && ip -4 route add $(ip -4 route show table $ROUTE_TABLE default) table main; } || echo "Error: Cannot restore original default ipv4 route, possibly the table is in an unclean state."
             else
                 echo "No IPv4 default route in table $ROUTE_TABLE"
             fi
@@ -164,7 +164,7 @@ process_default_route() {
             # IPv6 default-route cleanup
             if ip -6 route show table "$ROUTE_TABLE" | grep -q '^default '; then
                 echo "IPv6 default route exists in table $ROUTE_TABLE"
-                ip -6 route change $(ip -6 route show table $ROUTE_TABLE default) table main || echo "Error: Cannot restore original default ipv6 route, possibly the table is in an unclean state."
+                ip -6 route change $(ip -6 route show table $ROUTE_TABLE default) table main || { ip -6 route del default table main && ip -6 route add $(ip -6 route show table $ROUTE_TABLE default) table main; } || echo "Error: Cannot restore original default ipv6 route, possibly the table is in an unclean state."
             else
                 echo "No IPv6 default route in table $ROUTE_TABLE"
             fi
