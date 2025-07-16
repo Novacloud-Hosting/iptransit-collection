@@ -108,13 +108,13 @@ process_default_route() {
                 if ip -4 route show table main | grep -q '^default '; then
                     echo "IPv4 default route exists on main"
                     if [[ "$endpoint_is_ipv6" == false ]]; then
-                        ip -4 route add $(ip -4 route show table main default | sed "s/^default/${ENDPOINT_REMOTE}/") table main || { echo "Error: failed while adding route for $ENDPOINT_REMOTE" >&2; exit 1 }
+                        ip -4 route add $(ip -4 route show table main default | sed "s/^default/${ENDPOINT_REMOTE}/") table main || { echo "Error: failed while adding route for $ENDPOINT_REMOTE"; exit 1; }
                     fi
-                    ip -4 route add $(ip -4 route show table main default) table $ROUTE_TABLE || { echo "Error: failed while cloning default route to $ROUTE_TABLE" >&2; exit 1 }
+                    ip -4 route add $(ip -4 route show table main default) table $ROUTE_TABLE || { echo "Error: failed while cloning default route to $ROUTE_TABLE"; exit 1; }
                     pkill dhclient || echo "DHCP client not running."
                     for address in $(ip -4 addr show dev $(ip -4 route show table $ROUTE_TABLE default | sed -n 's/.* dev \([^ ]*\).*/\1/p') | sed -n 's/.*inet \([0-9]\{1,3\}\(\.[0-9]\{1,3\}\)\{3\}\).*/\1/p'); do
-                        ip -4 rule add from ${address} table $ROUTE_TABLE || { echo "Error: failed while adding IPv4 $address rule to $ROUTE_TABLE" >&2; exit 1 }
-                        ip -4 addr change ${address} dev $(ip -4 route show table $ROUTE_TABLE default | sed -n 's/.* dev \([^ ]*\).*/\1/p') || { echo "Error: failed while making sure that IPv4 $address is static." >&2; exit 1 } # Fuck DHCP
+                        ip -4 rule add from ${address} table $ROUTE_TABLE || { echo "Error: failed while adding IPv4 $address rule to $ROUTE_TABLE"; exit 1; }
+                        ip -4 addr change ${address} dev $(ip -4 route show table $ROUTE_TABLE default | sed -n 's/.* dev \([^ ]*\).*/\1/p') || { echo "Error: failed while making sure that IPv4 $address is static."; exit 1; } # Fuck DHCP
                     done
                 else
                     echo "No IPv4 default route on main"
@@ -123,7 +123,7 @@ process_default_route() {
                         exit 1
                     fi
                 fi
-                ip -4 route change default via $GATEWAY_IPV4 dev $TUNNEL_IF table main || ip -4 route change default via $GATEWAY_IPV4 dev $TUNNEL_IF table main onlink || { echo "Error: failed while adding Default-route IPv4 for Tunnel to main-table." >&2; exit 1 }
+                ip -4 route change default via $GATEWAY_IPV4 dev $TUNNEL_IF table main || ip -4 route change default via $GATEWAY_IPV4 dev $TUNNEL_IF table main onlink || { echo "Error: failed while adding Default-route IPv4 for Tunnel to main-table."; exit 1; }
             fi
 
             if [[ ${#ipv6_addrs[@]} -gt 0 ]]; then
