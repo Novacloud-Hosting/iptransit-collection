@@ -123,7 +123,7 @@ process_default_route() {
                         exit 1
                     fi
                 fi
-                ip -4 route change default via $GATEWAY_IPV4 dev $TUNNEL_IF table main || ip -4 route change default via $GATEWAY_IPV4 dev $TUNNEL_IF table main onlink || { echo "Error: failed while adding Default-route IPv4 for Tunnel to main-table."; exit 1; }
+                ip -4 route change default via $GATEWAY_IPV4 dev $TUNNEL_IF table main onlink || { ip -4 route del default && ip -4 route add default via $GATEWAY_IPV4 dev $TUNNEL_IF table main onlink; } || { echo "Error: failed while adding Default-route IPv4 for Tunnel to main-table."; exit 1; }
             fi
 
             if [[ ${#ipv6_addrs[@]} -gt 0 ]]; then
@@ -146,7 +146,7 @@ process_default_route() {
                         exit 1
                     fi
                 fi
-                ip -6 route change default via $GATEWAY_IPV6 dev $TUNNEL_IF table main || ip -6 route change default via $GATEWAY_IPV6 dev $TUNNEL_IF table main onlink
+                ip -6 route change default via $GATEWAY_IPV6 dev $TUNNEL_IF table main onlink || { ip -6 route del default && ip -6 route add default via $GATEWAY_IPV6 dev $TUNNEL_IF table main onlink; } || { echo "Error: failed while adding Default-route IPv6 for Tunnel to main-table."; exit 1; }
             fi
 
         elif [[ "$action" == "down" ]]; then
